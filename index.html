@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>Home Plate 🍱</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Georgia',serif;background:#fff8f0}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .fade-in{animation:fadeIn 0.3s ease}
+  input,textarea,button{font-family:'Georgia',serif}
+  ::-webkit-scrollbar{width:4px}
+  ::-webkit-scrollbar-thumb{background:#f4821f44;border-radius:4px}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const{useState,useRef}=React;
+
+const C={
+  saffron:"#F4821F",turmeric:"#E8A020",cream:"#FDF6EC",
+  cardamom:"#2D4A22",clay:"#8B4513",rust:"#C1440E",
+  sage:"#5C7A4E",warmWhite:"#FFFBF5",charcoal:"#1A1A1A",muted:"#7A6A5A"
+};
+
+const CHEFS=[
+  {id:1,name:"Meera Aunty",specialty:"North Indian",rating:4.9,meals:["Dal Makhani","Butter Chicken","Paneer Tikka","Rajma Chawal"],price:120,deliveryTime:"30-40 min",avatar:"👩‍🍳",badge:"Top Chef",subscriptions:42,
+   menu:[
+     {category:"Main Course",items:[
+       {name:"Dal Makhani",desc:"Slow-cooked black lentils in rich tomato-butter gravy",price:130,tag:"Bestseller",emoji:"🫕"},
+       {name:"Butter Chicken",desc:"Tender chicken in velvety tomato-cream sauce",price:150,tag:"Popular",emoji:"🍗"},
+       {name:"Paneer Tikka Masala",desc:"Grilled paneer in spiced onion-tomato gravy",price:140,tag:"Veg",emoji:"🧀"},
+       {name:"Rajma Chawal",desc:"Kidney beans curry served with steamed rice",price:110,tag:"Comfort",emoji:"🍛"},
+       {name:"Shahi Korma",desc:"Rich slow-cooked meat in aromatic mughlai gravy",price:160,tag:"Special",emoji:"🥘"},
+     ]},
+     {category:"Breads & Rice",items:[
+       {name:"Butter Naan",desc:"Soft tandoor-style bread with butter",price:30,tag:"Side",emoji:"🫓"},
+       {name:"Jeera Rice",desc:"Fragrant cumin-tempered basmati rice",price:60,tag:"Side",emoji:"🍚"},
+       {name:"Paratha (2 pcs)",desc:"Whole wheat layered flatbread",price:40,tag:"Side",emoji:"🫓"},
+     ]},
+     {category:"Desserts",items:[
+       {name:"Gulab Jamun (4 pcs)",desc:"Soft milk-solid dumplings in rose syrup",price:60,tag:"Sweet",emoji:"🍮"},
+       {name:"Phirni",desc:"Creamy rice pudding with saffron",price:70,tag:"Sweet",emoji:"🍨"},
+     ]},
+   ]},
+  {id:2,name:"Rajan Bhai",specialty:"South Indian",rating:4.7,meals:["Idli Sambar","Dosa","Rasam Rice","Chettinad Curry"],price:100,deliveryTime:"25-35 min",avatar:"👨‍🍳",badge:"Trusted",subscriptions:38,
+   menu:[
+     {category:"Breakfast",items:[
+       {name:"Idli Sambar (4 pcs)",desc:"Steamed rice cakes with lentil soup & chutneys",price:80,tag:"Bestseller",emoji:"🫓"},
+       {name:"Masala Dosa",desc:"Crispy rice crepe stuffed with spiced potato filling",price:90,tag:"Popular",emoji:"🥞"},
+       {name:"Medu Vada (3 pcs)",desc:"Crispy lentil fritters with sambar & chutney",price:70,tag:"Classic",emoji:"🍩"},
+       {name:"Uttapam",desc:"Thick rice pancake topped with onions & tomatoes",price:85,tag:"Healthy",emoji:"🥞"},
+     ]},
+     {category:"Meals",items:[
+       {name:"Rasam Rice",desc:"Tangy pepper-tomato broth served with rice",price:100,tag:"Comfort",emoji:"🍲"},
+       {name:"Chettinad Chicken Curry",desc:"Fiery aromatic curry from Tamil Nadu",price:140,tag:"Spicy",emoji:"🍗"},
+       {name:"Sambar Rice",desc:"Lentil vegetable stew with rice",price:90,tag:"Veg",emoji:"🍛"},
+     ]},
+     {category:"Sides & Drinks",items:[
+       {name:"Coconut Chutney",desc:"Fresh ground coconut with green chilli",price:20,tag:"Side",emoji:"🥥"},
+       {name:"Filter Coffee",desc:"Traditional South Indian drip coffee",price:35,tag:"Drink",emoji:"☕"},
+     ]},
+   ]},
+  {id:3,name:"Sunita Di",specialty:"Gujarati & Vegan",rating:4.8,meals:["Thepla","Kadhi Khichdi","Undhiyu","Dhokla"],price:110,deliveryTime:"35-45 min",avatar:"👩‍🍳",badge:"Vegan Expert",subscriptions:29,
+   menu:[
+     {category:"Snacks",items:[
+       {name:"Dhokla",desc:"Steamed fermented chickpea cake, light & spongy",price:70,tag:"Bestseller",emoji:"🟡"},
+       {name:"Khandvi",desc:"Rolled chickpea flour bites with sesame tempering",price:65,tag:"Light",emoji:"🌀"},
+       {name:"Fafda Jalebi",desc:"Crispy gram flour strips with sweet jalebi",price:75,tag:"Classic",emoji:"🍭"},
+     ]},
+     {category:"Main Course",items:[
+       {name:"Thepla",desc:"Spiced fenugreek flatbreads, great with pickle",price:60,tag:"Vegan",emoji:"🫓"},
+       {name:"Kadhi Khichdi",desc:"Tangy yogurt curry with rice-lentil porridge",price:100,tag:"Comfort",emoji:"🍛"},
+       {name:"Undhiyu",desc:"Mixed winter vegetable curry, Surat style",price:120,tag:"Special",emoji:"🥘"},
+       {name:"Dal Baati Churma",desc:"Baked wheat balls with lentil curry & sweet churma",price:130,tag:"Festive",emoji:"🫙"},
+     ]},
+     {category:"Sweets",items:[
+       {name:"Mohanthal",desc:"Rich gram flour fudge with cardamom & ghee",price:80,tag:"Sweet",emoji:"🍬"},
+       {name:"Shrikhand",desc:"Strained yogurt dessert with saffron & pistachios",price:75,tag:"Sweet",emoji:"🍨"},
+     ]},
+   ]},
+  {id:4,name:"Thomas Uncle",specialty:"Kerala & Seafood",rating:4.6,meals:["Fish Curry","Appam Stew","Kerala Prawn","Puttu Kadala"],price:130,deliveryTime:"30-40 min",avatar:"👨‍🍳",badge:"Seafood Pro",subscriptions:21,
+   menu:[
+     {category:"Seafood",items:[
+       {name:"Kerala Fish Curry",desc:"Kingfish in tangy coconut-kudampuli gravy",price:160,tag:"Bestseller",emoji:"🐟"},
+       {name:"Prawn Masala",desc:"Juicy prawns in spiced coconut-tomato gravy",price:180,tag:"Popular",emoji:"🍤"},
+       {name:"Meen Pollichathu",desc:"Spiced fish wrapped & roasted in banana leaf",price:190,tag:"Special",emoji:"🐠"},
+       {name:"Crab Roast",desc:"Fresh crab stir-fried with Kerala spices",price:220,tag:"Premium",emoji:"🦀"},
+     ]},
+     {category:"Breakfast",items:[
+       {name:"Appam & Stew",desc:"Lacy rice hoppers with vegetable coconut stew",price:110,tag:"Classic",emoji:"🥞"},
+       {name:"Puttu & Kadala Curry",desc:"Steamed rice cake with black chickpea curry",price:100,tag:"Healthy",emoji:"🫙"},
+       {name:"Idiyappam",desc:"String hoppers with coconut milk & curry",price:95,tag:"Light",emoji:"🍜"},
+     ]},
+     {category:"Sides",items:[
+       {name:"Papadum (4 pcs)",desc:"Crispy lentil wafers",price:25,tag:"Side",emoji:"🥨"},
+       {name:"Kerala Parotta",desc:"Layered flaky flatbread",price:35,tag:"Side",emoji:"🫓"},
+     ]},
+   ]},
+  {id:5,name:"Kavita Ben",specialty:"Desserts & Sweets",rating:4.9,meals:["Gulab Jamun","Kheer","Halwa","Malpua"],price:90,deliveryTime:"20-30 min",avatar:"👩‍🍳",badge:"Sweet Specialist",subscriptions:55,
+   menu:[
+     {category:"Indian Classics",items:[
+       {name:"Gulab Jamun (6 pcs)",desc:"Melt-in-mouth milk dumplings in rose-cardamom syrup",price:80,tag:"Bestseller",emoji:"🟤"},
+       {name:"Gajar Halwa",desc:"Slow-cooked carrot pudding with khoya & dry fruits",price:90,tag:"Seasonal",emoji:"🥕"},
+       {name:"Kheer",desc:"Creamy rice pudding with saffron & almonds",price:85,tag:"Classic",emoji:"🍚"},
+       {name:"Malpua",desc:"Fried pancakes soaked in sugar syrup with rabri",price:95,tag:"Festival",emoji:"🥞"},
+       {name:"Rasmalai (4 pcs)",desc:"Soft paneer patties in saffron-pistachio milk",price:110,tag:"Premium",emoji:"🧁"},
+     ]},
+     {category:"Cakes & Bakes",items:[
+       {name:"Atta Cake (slice)",desc:"Whole wheat jaggery cake — guilt-free treat",price:60,tag:"Healthy",emoji:"🍰"},
+       {name:"Dry Fruit Ladoo (4 pcs)",desc:"Energy-packed dates, nuts & seeds balls",price:100,tag:"Nutritious",emoji:"🟡"},
+       {name:"Coconut Barfi (6 pcs)",desc:"Soft coconut fudge with cardamom",price:75,tag:"Sweet",emoji:"🤍"},
+     ]},
+     {category:"Beverages",items:[
+       {name:"Thandai",desc:"Chilled spiced milk drink with rose & nuts",price:55,tag:"Drink",emoji:"🥛"},
+       {name:"Badam Milk",desc:"Warm almond-saffron flavoured milk",price:50,tag:"Drink",emoji:"🥛"},
+     ]},
+   ]},
+  {id:6,name:"Arjun Chef",specialty:"Family Meals",rating:4.7,meals:["Dal Rice","Sabzi Roti","Mixed Veg","Chole Bhature"],price:95,deliveryTime:"25-35 min",avatar:"👨‍🍳",badge:"Family Fave",subscriptions:33,
+   menu:[
+     {category:"Dal & Rice",items:[
+       {name:"Dal Tadka & Rice",desc:"Yellow lentils tempered with cumin & ghee, served with rice",price:100,tag:"Bestseller",emoji:"🍛"},
+       {name:"Chole Bhature",desc:"Spiced chickpea curry with deep-fried puffy bread",price:110,tag:"Popular",emoji:"🍽️"},
+       {name:"Rajma Rice",desc:"Kidney bean curry with jeera rice",price:105,tag:"Comfort",emoji:"🫕"},
+       {name:"Kadai Paneer & Naan",desc:"Paneer in bell pepper-tomato gravy with bread",price:130,tag:"Veg",emoji:"🧀"},
+     ]},
+     {category:"Sabzi & Roti",items:[
+       {name:"Aloo Gobi & Roti (3 pcs)",desc:"Potato-cauliflower stir-fry with whole wheat rotis",price:90,tag:"Homely",emoji:"🥦"},
+       {name:"Mixed Veg Curry & Rice",desc:"Seasonal vegetables in light tomato gravy",price:95,tag:"Healthy",emoji:"🥘"},
+       {name:"Sarson Saag & Makki Roti",desc:"Mustard greens with corn flatbread & white butter",price:115,tag:"Special",emoji:"🌽"},
+     ]},
+     {category:"Family Thali",items:[
+       {name:"Full Thali (1 person)",desc:"Dal, sabzi, roti, rice, salad & papad",price:150,tag:"Value",emoji:"🍽️"},
+       {name:"Family Thali (4 persons)",desc:"Complete meal for 4 with all accompaniments",price:520,tag:"Best Value",emoji:"👨‍👩‍👧‍👦"},
+     ]},
+   ]},
+];
+
+const SUBS=[
+  {id:"daily1",label:"Daily · 1 Meal",desc:"Lunch or Dinner",price:1800,period:"/month",icon:"☀️",color:"#F4821F"},
+  {id:"daily2",label:"Daily · 2 Meals",desc:"Lunch + Dinner",price:3200,period:"/month",icon:"🌅",color:"#E8A020"},
+  {id:"weekly5",label:"Weekly · 5 Days",desc:"Mon–Fri, 1 meal/day",price:2000,period:"/month",icon:"📅",color:"#5C7A4E"},
+  {id:"weekly7",label:"Weekly · 7 Days",desc:"All week, 1 meal/day",price:2600,period:"/month",icon:"🗓️",color:"#2D4A22"},
+  {id:"flex",label:"Flex Credits",desc:"10 meal credits, use anytime",price:1100,period:"/pack",icon:"🎟️",color:"#C1440E"},
+];
+
+const ORDER_STAGES=["Order Placed","Chef Accepted","Cooking","Out for Delivery","Delivered"];
+
+const DISH_DATA={
+  1:[{name:"Dal Makhani",rating:4.9,orders:52},{name:"Butter Chicken",rating:4.7,orders:38},{name:"Paneer Tikka",rating:4.6,orders:29},{name:"Rajma Chawal",rating:4.5,orders:21}],
+  2:[{name:"Idli Sambar",rating:4.8,orders:44},{name:"Dosa",rating:4.7,orders:41},{name:"Rasam Rice",rating:4.4,orders:18},{name:"Chettinad Curry",rating:4.6,orders:22}],
+  3:[{name:"Thepla",rating:4.9,orders:33},{name:"Kadhi Khichdi",rating:4.8,orders:28},{name:"Undhiyu",rating:4.7,orders:19},{name:"Dhokla",rating:4.6,orders:24}],
+  4:[{name:"Fish Curry",rating:4.8,orders:31},{name:"Appam Stew",rating:4.5,orders:22},{name:"Kerala Prawn",rating:4.7,orders:27},{name:"Puttu Kadala",rating:4.4,orders:15}],
+  5:[{name:"Gulab Jamun",rating:5.0,orders:62},{name:"Kheer",rating:4.9,orders:48},{name:"Halwa",rating:4.7,orders:35},{name:"Malpua",rating:4.8,orders:41}],
+  6:[{name:"Dal Rice",rating:4.8,orders:45},{name:"Sabzi Roti",rating:4.7,orders:39},{name:"Mixed Veg",rating:4.5,orders:28},{name:"Chole Bhature",rating:4.9,orders:51}],
+};
+
+const MEAL_PLANS=[
+  {title:"Non-Veg Specials",desc:"Chicken, mutton & more",icon:"🍗",gradient:"linear-gradient(135deg,#fee2e2,#fecaca)",tag:"Bestseller",pref:"Non-Veg"},
+  {title:"Vegetarian Meals",desc:"Wholesome sabzi, dal & roti",icon:"🥗",gradient:"linear-gradient(135deg,#dcfce7,#bbf7d0)",tag:"Trending",pref:"Vegetarian"},
+  {title:"Family Meal Plan",desc:"Big portions, bigger smiles",icon:"🏠",gradient:"linear-gradient(135deg,#fef9c3,#fde68a)",tag:"Popular",pref:"Family"},
+  {title:"Dessert Add-ons",desc:"Sweet endings every night",icon:"🍮",gradient:"linear-gradient(135deg,#fce7f3,#fbcfe8)",tag:"New",pref:"Dessert"},
+];
+
+const FEATURES=[
+  {icon:"🍳",title:"Fresh on Order",desc:"Every meal cooked fresh after you place your order — never pre-made."},
+  {icon:"🫙",title:"Less Oil",desc:"Our chefs use minimal oil so your food stays light and healthy."},
+  {icon:"🥘",title:"Healthy & Homely",desc:"Wholesome recipes just like home — nutritious, balanced, and satisfying."},
+  {icon:"✨",title:"100% Hygienic",desc:"Prepared in clean kitchens with the highest food safety standards."},
+];
+
+function matchChefs(pref){
+  if(!pref.trim())return CHEFS;
+  const kw=pref.toLowerCase();
+  const m=CHEFS.filter(c=>c.specialty.toLowerCase().includes(kw)||c.meals.some(x=>x.toLowerCase().includes(kw)));
+  return m.length?m:CHEFS;
+}
+
+function Stars({value=5,onChange}){
+  return(
+    <div style={{display:"flex",gap:3}}>
+      {[1,2,3,4,5].map(s=>(
+        <span key={s} onClick={()=>onChange&&onChange(s)}
+          style={{fontSize:22,cursor:onChange?"pointer":"default",
+            color:s<=value?"#F4821F":"#ddd",transition:"color 0.15s"}}>★</span>
+      ))}
+    </div>
+  );
+}
+
+function Badge({text,color=C.saffron}){
+  return <span style={{background:color+"22",color,border:`1px solid ${color}55`,
+    borderRadius:20,padding:"2px 10px",fontSize:11,fontWeight:700,letterSpacing:0.5,whiteSpace:"nowrap"}}>{text}</span>;
+}
+
+function Card({children,style={}}){
+  return <div style={{background:"#fff",borderRadius:16,padding:"18px 20px",
+    boxShadow:"0 2px 16px rgba(0,0,0,0.07)",border:"1px solid #f0e8dc",...style}}>{children}</div>;
+}
+
+function Btn({children,onClick,style={},variant="primary",disabled=false}){
+  const base={border:"none",borderRadius:10,padding:"12px 20px",fontWeight:700,
+    cursor:disabled?"not-allowed":"pointer",fontSize:14,transition:"all 0.2s",
+    fontFamily:"inherit",opacity:disabled?0.6:1};
+  const variants={
+    primary:{background:`linear-gradient(135deg,${C.saffron},${C.rust})`,color:"#fff"},
+    outline:{background:"transparent",color:C.saffron,border:`2px solid ${C.saffron}`},
+    ghost:{background:C.cream,color:C.charcoal},
+    green:{background:`linear-gradient(135deg,${C.sage},${C.cardamom})`,color:"#fff"},
+  };
+  return <button onClick={!disabled?onClick:undefined} style={{...base,...variants[variant],...style}}>{children}</button>;
+}
+
+// ── LOGIN ──────────────────────────────────────────────────────────────────────
+function Login({onLogin}){
+  const[form,setForm]=useState({name:"",phone:"",email:"",address:""});
+  const[role,setRole]=useState("user");
+  const upd=(k,v)=>setForm(f=>({...f,[k]:v}));
+  const valid=form.name&&form.phone&&form.email&&form.address;
+
+  return(
+    <div style={{minHeight:"100vh",background:"linear-gradient(160deg,#fff8f0 0%,#fdecd5 50%,#fce3c8 100%)",
+      display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
+      <div style={{width:"100%",maxWidth:440}} className="fade-in">
+        <div style={{textAlign:"center",marginBottom:28}}>
+          <div style={{fontSize:52,marginBottom:6}}>🍱</div>
+          <h1 style={{fontSize:30,fontWeight:900,color:C.rust,margin:0,letterSpacing:-1}}>Home Plate</h1>
+          <p style={{color:C.muted,margin:"6px 0 0",fontStyle:"italic",fontSize:14}}>Home-cooked meals, delivered with love</p>
+        </div>
+        <Card>
+          <div style={{display:"flex",gap:8,marginBottom:18}}>
+            {["user","chef"].map(r=>(
+              <button key={r} onClick={()=>setRole(r)} style={{
+                flex:1,padding:"10px 0",borderRadius:8,border:"none",fontWeight:700,
+                fontFamily:"inherit",cursor:"pointer",fontSize:14,transition:"all 0.2s",
+                background:role===r?`linear-gradient(135deg,${C.saffron},${C.rust})`:C.cream,
+                color:role===r?"#fff":C.muted}}>
+                {r==="user"?"🍽️ I'm Hungry":"👩‍🍳 I'm a Chef"}
+              </button>
+            ))}
+          </div>
+          {["name","phone","email","address"].map(f=>(
+            <div key={f} style={{marginBottom:13}}>
+              <label style={{fontSize:11,fontWeight:700,color:C.muted,letterSpacing:0.5,
+                textTransform:"uppercase",display:"block",marginBottom:4}}>
+                {f==="address"?"Delivery Address":f.charAt(0).toUpperCase()+f.slice(1)}
+              </label>
+              <input value={form[f]} onChange={e=>upd(f,e.target.value)}
+                placeholder={f==="phone"?"+91 98765 43210":f==="email"?"you@email.com":""}
+                type={f==="email"?"email":f==="phone"?"tel":"text"}
+                style={{width:"100%",padding:"10px 13px",borderRadius:8,
+                  border:`1.5px solid ${form[f]?C.saffron:"#e8ddd0"}`,fontSize:14,
+                  background:"#fffdf9",outline:"none",transition:"border-color 0.2s",color:C.charcoal}}/>
+            </div>
+          ))}
+          <Btn onClick={()=>onLogin({...form,role})} disabled={!valid}
+            style={{width:"100%",marginTop:6,fontSize:15,padding:"13px"}}>
+            {role==="user"?"Find My Chef →":"Start Cooking →"}
+          </Btn>
+        </Card>
+        <p style={{textAlign:"center",color:C.muted,fontSize:12,marginTop:14}}>🔒 Your data is safe & never shared</p>
+      </div>
+    </div>
+  );
+}
+
+
+// ── CHEF MENU MODAL ────────────────────────────────────────────────────────────
+function ChefMenuModal({chef,onClose,onOrder,onAddToCart,cart}){
+  const tagColors={
+    "Bestseller":C.rust,"Popular":C.saffron,"Veg":C.sage,"Comfort":C.cardamom,
+    "Special":C.turmeric,"Side":"#888","Sweet":C.clay,"Drink":"#4a90d9",
+    "Classic":C.muted,"Spicy":"#e53935","Healthy":C.sage,"Light":C.sage,
+    "Premium":"#7b1fa2","Festive":C.turmeric,"Festival":C.turmeric,
+    "Value":C.cardamom,"Best Value":C.rust,"Seasonal":C.saffron,
+    "Vegan":C.sage,"Nutritious":C.sage,"Homely":C.clay
+  };
+  return(
+    <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,zIndex:200,
+      background:"rgba(0,0,0,0.55)",display:"flex",alignItems:"flex-end",justifyContent:"center"}}
+      onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
+      <div style={{width:"100%",maxWidth:500,background:"#fff",borderRadius:"20px 20px 0 0",
+        maxHeight:"88vh",display:"flex",flexDirection:"column",
+        boxShadow:"0 -8px 40px rgba(0,0,0,0.2)"}}>
+        {/* Modal Header */}
+        <div style={{background:`linear-gradient(135deg,${C.rust},${C.saffron})`,
+          borderRadius:"20px 20px 0 0",padding:"18px 20px",flexShrink:0}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <div style={{display:"flex",gap:12,alignItems:"center"}}>
+              <span style={{fontSize:32}}>{chef.avatar}</span>
+              <div>
+                <div style={{fontWeight:900,color:"#fff",fontSize:17}}>{chef.name}</div>
+                <div style={{fontSize:11,color:"rgba(255,255,255,0.85)"}}>{chef.specialty} · ★ {chef.rating} · {chef.deliveryTime}</div>
+              </div>
+            </div>
+            <button onClick={onClose} style={{background:"rgba(255,255,255,0.25)",border:"none",
+              borderRadius:"50%",width:32,height:32,cursor:"pointer",fontSize:18,color:"#fff",
+              display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>✕</button>
+          </div>
+        </div>
+        {/* Scrollable Menu */}
+        <div style={{overflowY:"auto",flex:1,padding:"16px 16px 20px"}}>
+          {chef.menu.map(section=>(
+            <div key={section.category} style={{marginBottom:18}}>
+              <div style={{fontSize:12,fontWeight:800,color:C.muted,textTransform:"uppercase",
+                letterSpacing:1,marginBottom:10,paddingLeft:2,
+                borderLeft:`3px solid ${C.saffron}`,paddingLeft:8}}>
+                {section.category}
+              </div>
+              {section.items.map(item=>(
+                <div key={item.name} style={{display:"flex",justifyContent:"space-between",
+                  alignItems:"center",padding:"11px 12px",borderRadius:12,marginBottom:8,
+                  background:"#fffbf5",border:"1px solid #f0e8dc",gap:10}}>
+                  <div style={{display:"flex",gap:10,alignItems:"flex-start",flex:1,minWidth:0}}>
+                    <span style={{fontSize:24,flexShrink:0}}>{item.emoji}</span>
+                    <div style={{minWidth:0}}>
+                      <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap",marginBottom:2}}>
+                        <span style={{fontWeight:800,fontSize:13,color:C.charcoal}}>{item.name}</span>
+                        <span style={{fontSize:9,fontWeight:700,padding:"1px 7px",borderRadius:20,
+                          background:(tagColors[item.tag]||C.muted)+"20",
+                          color:tagColors[item.tag]||C.muted,border:`1px solid ${(tagColors[item.tag]||C.muted)}44`}}>
+                          {item.tag}
+                        </span>
+                      </div>
+                      <div style={{fontSize:11,color:C.muted,lineHeight:1.4}}>{item.desc}</div>
+                    </div>
+                  </div>
+                  <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:6,flexShrink:0}}>
+                    <span style={{fontWeight:900,color:C.rust,fontSize:14}}>₹{item.price}</span>
+                    {(()=>{
+                      const qty=cart.filter(x=>x.item.name===item.name&&x.chef.id===chef.id).reduce((s,x)=>s+x.qty,0);
+                      return qty>0?(
+                        <div style={{display:"flex",alignItems:"center",gap:4}}>
+                          <button onClick={()=>onAddToCart(item,chef,-1)} style={{width:26,height:26,borderRadius:"50%",border:`2px solid ${C.saffron}`,background:"#fff",color:C.saffron,fontWeight:900,cursor:"pointer",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
+                          <span style={{fontWeight:800,color:C.rust,fontSize:13,minWidth:14,textAlign:"center"}}>{qty}</span>
+                          <button onClick={()=>onAddToCart(item,chef,1)} style={{width:26,height:26,borderRadius:"50%",border:"none",background:`linear-gradient(135deg,${C.saffron},${C.rust})`,color:"#fff",fontWeight:900,cursor:"pointer",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
+                        </div>
+                      ):(
+                        <button onClick={()=>onAddToCart(item,chef,1)} style={{background:`linear-gradient(135deg,${C.saffron},${C.rust})`,border:"none",borderRadius:8,padding:"5px 10px",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit",whiteSpace:"nowrap"}}>+ Add</button>
+                      );
+                    })()}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+        {/* Footer */}
+        <div style={{padding:"12px 16px",borderTop:"1px solid #f0e8dc",flexShrink:0,background:"#fffbf5"}}> 
+          {cart.length>0&&(
+            <div style={{marginBottom:8,padding:"9px 12px",background:"linear-gradient(135deg,#fff8f0,#fef3e8)",borderRadius:10,border:`1px solid ${C.saffron}44`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <span style={{fontSize:12,color:C.muted}}>🛒 {cart.reduce((s,x)=>s+x.qty,0)} item{cart.reduce((s,x)=>s+x.qty,0)!==1?"s":""} in cart</span>
+              <span style={{fontWeight:900,color:C.rust,fontSize:13}}>₹{cart.reduce((s,x)=>s+x.item.price*x.qty,0)}</span>
+            </div>
+          )}
+          <div style={{display:"flex",gap:8}}>
+            <button onClick={onClose} style={{flex:1,padding:"11px",borderRadius:10,border:`2px solid ${C.saffron}`,background:"transparent",color:C.saffron,fontWeight:700,cursor:"pointer",fontFamily:"inherit",fontSize:13}}>← Back</button>
+            <button onClick={()=>onOrder(chef)} style={{flex:2,padding:"11px",borderRadius:10,border:"none",background:`linear-gradient(135deg,${C.saffron},${C.rust})`,color:"#fff",fontWeight:700,cursor:"pointer",fontFamily:"inherit",fontSize:13}}>
+              View Cart 🛒
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── USER APP ───────────────────────────────────────────────────────────────────
+function UserApp({user,onLogout}){
+  const[view,setView]=useState("home");
+  const[plan,setPlan]=useState(null);
+  const[delivTime,setDelivTime]=useState("12:30");
+  const[pref,setPref]=useState("");
+  const[chef,setChef]=useState(null);
+  const[stage,setStage]=useState(0);
+  const[rating,setRating]=useState(5);
+  const[note,setNote]=useState("");
+  const[sent,setSent]=useState(false);
+  const[analysis,setAnalysis]=useState("");
+  const[loading,setLoading]=useState(false);
+  const[chefRatings,setChefRatings]=useState({});
+  const[menuChef,setMenuChef]=useState(null);
+  const[cart,setCart]=useState([]); // [{item, chef, qty}]
+  const[cartOpen,setCartOpen]=useState(false);
+  const timerRef=useRef(null);
+
+  function addToCart(item,chef){
+    setCart(prev=>{
+      const idx=prev.findIndex(x=>x.item.name===item.name&&x.chef.id===chef.id);
+      if(idx>=0){const n=[...prev];n[idx]={...n[idx],qty:n[idx].qty+1};return n;}
+      return [...prev,{item,chef,qty:1}];
+    });
+  }
+  function removeFromCart(itemName,chefId){
+    setCart(prev=>{
+      const idx=prev.findIndex(x=>x.item.name===itemName&&x.chef.id===chefId);
+      if(idx<0)return prev;
+      const n=[...prev];
+      if(n[idx].qty>1){n[idx]={...n[idx],qty:n[idx].qty-1};return n;}
+      return n.filter((_,i)=>i!==idx);
+    });
+  }
+  function clearCart(){setCart([]);}
+  const cartTotal=cart.reduce((s,x)=>s+x.item.price*x.qty,0);
+  const cartCount=cart.reduce((s,x)=>s+x.qty,0);
+
+  const filtered=matchChefs(pref);
+
+  function startOrder(c){
+    setChef(c);setStage(0);setView("track");
+    let s=0;
+    timerRef.current=setInterval(()=>{
+      s++;setStage(s);
+      if(s>=ORDER_STAGES.length-1)clearInterval(timerRef.current);
+    },3000);
+  }
+
+  async function fetchAI(){
+    setLoading(true);setAnalysis("");
+    try{
+      const r=await fetch("https://api.anthropic.com/v1/messages",{
+        method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:800,
+          messages:[{role:"user",content:`You are a warm food & nutrition advisor for a home-chef delivery app. User ${user.name} ordered ${chef?.specialty||"mixed"} food. Rating: ${rating}/5. Note: "${note||"Great food!"}". Give a friendly weekly analysis in 3 short paragraphs: what went well, nutritional tips, meal variety suggestions. Use food emojis.`}]})
+      });
+      const d=await r.json();
+      setAnalysis(d.content?.[0]?.text||"Great choices this week! Keep enjoying home-cooked meals 🍱");
+    }catch{
+      setAnalysis("Your meals this week showed wonderful variety! 🌟 Consider balancing proteins with more greens. Try a new cuisine next week for nutritional diversity. Home food is always the best choice — keep it up! 🍱");
+    }
+    setLoading(false);
+  }
+
+  const nav=[{id:"home",icon:"🏠",label:"Home"},{id:"subscribe",icon:"📋",label:"Plans"},
+    {id:"order",icon:"🍽️",label:"Order"},{id:"cart",icon:"🛒",label:"Cart"},{id:"dashboard",icon:"📊",label:"Dashboard"}];
+
+  return(
+    <div style={{minHeight:"100vh",background:"linear-gradient(160deg,#fff8f0,#fdecd5 60%,#fce3c8)",paddingBottom:80}}>
+      {/* Header */}
+      <div style={{background:`linear-gradient(135deg,${C.rust},${C.saffron})`,padding:"14px 18px",
+        display:"flex",alignItems:"center",justifyContent:"space-between",
+        boxShadow:"0 4px 20px rgba(196,68,14,0.3)",position:"sticky",top:0,zIndex:50}}>
+        <div>
+          <div style={{fontSize:17,fontWeight:900,color:"#fff",letterSpacing:-0.5}}>🍱 Home Plate</div>
+          <div style={{fontSize:11,color:"rgba(255,255,255,0.8)"}}>Hey {user.name.split(" ")[0]}! 👋</div>
+        </div>
+        <button onClick={onLogout} style={{background:"rgba(255,255,255,0.2)",border:"none",
+          borderRadius:8,padding:"6px 12px",color:"#fff",fontSize:12,cursor:"pointer",fontFamily:"inherit"}}>
+          Logout
+        </button>
+      </div>
+
+      <div style={{padding:"18px 15px",maxWidth:480,margin:"0 auto"}}>
+
+        {/* HOME */}
+        {view==="home"&&(
+          <div className="fade-in">
+            <div style={{marginBottom:18}}>
+              <h2 style={{fontSize:21,fontWeight:900,color:C.rust,margin:"0 0 3px"}}>What's for today?</h2>
+              <p style={{color:C.muted,margin:0,fontSize:13}}>Choose a plan, pick your chef, eat happy.</p>
+            </div>
+
+            {plan&&(
+              <Card style={{marginBottom:14,background:`linear-gradient(135deg,${C.cream},#fff)`,borderLeft:`4px solid ${C.saffron}`}}>
+                <div style={{fontSize:11,color:C.muted,fontWeight:700,textTransform:"uppercase",letterSpacing:0.5}}>Active Plan</div>
+                <div style={{fontSize:17,fontWeight:900,color:C.rust,marginTop:2}}>{SUBS.find(s=>s.id===plan)?.label}</div>
+              </Card>
+            )}
+
+            <div style={{marginBottom:18}}>
+              <h3 style={{fontSize:15,fontWeight:800,color:C.charcoal,margin:"0 0 10px"}}>✨ Popular Meal Plans</h3>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9}}>
+                {MEAL_PLANS.map(p=>(
+                  <div key={p.title} style={{background:p.gradient,borderRadius:14,padding:"13px 11px",
+                    border:"1px solid rgba(255,255,255,0.6)",cursor:"pointer",transition:"transform 0.2s"}}
+                    onMouseEnter={e=>e.currentTarget.style.transform="scale(1.03)"}
+                    onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}
+                    onClick={()=>{setPref(p.pref);setView("order");}}>
+                    <div style={{fontSize:24,marginBottom:3}}>{p.icon}</div>
+                    <div style={{fontSize:12,fontWeight:800,color:C.charcoal}}>{p.title}</div>
+                    <div style={{fontSize:10,color:C.muted,marginTop:2}}>{p.desc}</div>
+                    <div style={{marginTop:5}}>
+                      <span style={{fontSize:10,fontWeight:700,background:"#fff8",padding:"2px 7px",
+                        borderRadius:20,color:C.clay}}>{p.tag}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Features */}
+            <div style={{marginBottom:16}}>
+              <h3 style={{fontSize:15,fontWeight:800,color:C.charcoal,margin:"0 0 10px"}}>💚 Why Home Plate?</h3>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9}}>
+                {FEATURES.map(f=>(
+                  <div key={f.title} style={{background:"#fff",borderRadius:13,padding:"13px 11px",
+                    border:"1px solid #f0e8dc",boxShadow:"0 2px 10px rgba(0,0,0,0.05)"}}>
+                    <div style={{fontSize:24,marginBottom:5}}>{f.icon}</div>
+                    <div style={{fontSize:12,fontWeight:800,color:C.rust,marginBottom:3}}>{f.title}</div>
+                    <div style={{fontSize:10,color:C.muted,lineHeight:1.5}}>{f.desc}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9}}>
+              <Card style={{textAlign:"center",cursor:"pointer",background:"linear-gradient(135deg,#fff8f0,#fef3e8)",padding:"16px 12px"}}
+                onClick={()=>setView("subscribe")}>
+                <div style={{fontSize:28}}>📋</div>
+                <div style={{fontWeight:800,color:C.rust,fontSize:13}}>Choose Plan</div>
+                <div style={{fontSize:10,color:C.muted}}>Subscription tiers</div>
+              </Card>
+              <Card style={{textAlign:"center",cursor:"pointer",background:"linear-gradient(135deg,#f0fdf4,#dcfce7)",padding:"16px 12px"}}
+                onClick={()=>setView("order")}>
+                <div style={{fontSize:28}}>🍽️</div>
+                <div style={{fontWeight:800,color:C.cardamom,fontSize:13}}>Order Now</div>
+                <div style={{fontSize:10,color:C.muted}}>Find your chef</div>
+              </Card>
+            </div>
+
+            {chef&&stage<ORDER_STAGES.length&&(
+              <Card style={{marginTop:14,borderLeft:`4px solid ${C.sage}`}}>
+                <div style={{fontSize:11,fontWeight:700,color:C.muted,textTransform:"uppercase"}}>Live Order</div>
+                <div style={{fontWeight:800,color:C.cardamom}}>{chef.name} — {ORDER_STAGES[stage]}</div>
+                <Btn variant="ghost" onClick={()=>setView("track")} style={{marginTop:8,width:"100%",fontSize:12}}>Track Order →</Btn>
+              </Card>
+            )}
+          </div>
+        )}
+
+        {/* SUBSCRIBE */}
+        {view==="subscribe"&&(
+          <div className="fade-in">
+            <h2 style={{fontSize:21,fontWeight:900,color:C.rust,margin:"0 0 4px"}}>Subscription Plans</h2>
+            <p style={{color:C.muted,fontSize:13,marginBottom:18}}>Choose what works for your lifestyle</p>
+            {SUBS.map(sub=>(
+              <Card key={sub.id} style={{marginBottom:11,cursor:"pointer",
+                border:plan===sub.id?`2px solid ${sub.color}`:"1px solid #f0e8dc",
+                background:plan===sub.id?sub.color+"10":"#fff",transition:"all 0.2s"}}
+                onClick={()=>setPlan(sub.id)}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                  <div style={{display:"flex",alignItems:"center",gap:11}}>
+                    <span style={{fontSize:26}}>{sub.icon}</span>
+                    <div>
+                      <div style={{fontWeight:800,color:C.charcoal,fontSize:14}}>{sub.label}</div>
+                      <div style={{fontSize:11,color:C.muted}}>{sub.desc}</div>
+                    </div>
+                  </div>
+                  <div style={{textAlign:"right"}}>
+                    <div style={{fontWeight:900,color:sub.color,fontSize:17}}>₹{sub.price.toLocaleString()}</div>
+                    <div style={{fontSize:10,color:C.muted}}>{sub.period}</div>
+                  </div>
+                </div>
+                {plan===sub.id&&(
+                  <div style={{marginTop:7,padding:"5px 11px",background:sub.color+"20",
+                    borderRadius:7,fontSize:11,color:sub.color,fontWeight:700}}>✓ Plan Selected — Active</div>
+                )}
+              </Card>
+            ))}
+            <Btn onClick={()=>setView("order")} style={{width:"100%",marginTop:8}}>Order with This Plan →</Btn>
+          </div>
+        )}
+
+        {/* ORDER */}
+        {view==="order"&&(
+          <div className="fade-in">
+            <h2 style={{fontSize:21,fontWeight:900,color:C.rust,margin:"0 0 14px"}}>Place Your Order</h2>
+            <Card style={{marginBottom:14}}>
+              <label style={{fontSize:11,fontWeight:700,color:C.muted,textTransform:"uppercase",letterSpacing:0.5}}>Delivery Time</label>
+              <input type="time" value={delivTime} onChange={e=>setDelivTime(e.target.value)}
+                style={{width:"100%",marginTop:5,padding:"9px 11px",borderRadius:8,
+                  border:`1.5px solid ${C.saffron}`,fontSize:15,background:C.cream,color:C.charcoal,outline:"none"}}/>
+            </Card>
+            <Card style={{marginBottom:18}}>
+              <label style={{fontSize:11,fontWeight:700,color:C.muted,textTransform:"uppercase",letterSpacing:0.5}}>What would you like to eat today?</label>
+              <input value={pref} onChange={e=>setPref(e.target.value)}
+                placeholder="e.g. Dal, South Indian, Fish Curry, Chicken..."
+                style={{width:"100%",marginTop:5,padding:"9px 11px",borderRadius:8,
+                  border:`1.5px solid ${pref?C.saffron:"#e8ddd0"}`,fontSize:13,
+                  background:"#fffdf9",outline:"none"}}/>
+            </Card>
+            <h3 style={{fontSize:15,fontWeight:800,color:C.charcoal,margin:"0 0 11px"}}>
+              {pref?`Chefs for "${pref}"`:"All Available Chefs"}
+              <span style={{fontWeight:400,color:C.muted,fontSize:12}}> · {filtered.length} found</span>
+            </h3>
+            {filtered.map(c=>(
+              <Card key={c.id} style={{marginBottom:11}}>
+                <div style={{display:"flex",gap:11,alignItems:"flex-start"}}>
+                  <div style={{fontSize:32,background:C.cream,borderRadius:11,padding:"7px 9px",flexShrink:0}}>{c.avatar}</div>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:4}}>
+                      <div>
+                        <div style={{fontWeight:800,color:C.charcoal,fontSize:15}}>{c.name}</div>
+                        <div style={{fontSize:11,color:C.muted}}>{c.specialty}</div>
+                      </div>
+                      <Badge text={c.badge} color={C.rust}/>
+                    </div>
+                    <div style={{display:"flex",alignItems:"center",gap:5,margin:"4px 0",flexWrap:"wrap"}}>
+                      <span style={{color:C.saffron,fontSize:13}}>★</span>
+                      <span style={{fontWeight:700,fontSize:13}}>{c.rating}</span>
+                      <span style={{color:C.muted,fontSize:11}}>· {c.deliveryTime}</span>
+                      <span style={{color:C.muted,fontSize:11}}>· ₹{c.price}/meal</span>
+                    </div>
+                    <div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:9}}>
+                      {c.meals.slice(0,3).map(m=>(
+                        <span key={m} style={{fontSize:10,background:C.cream,color:C.clay,
+                          padding:"2px 7px",borderRadius:20,border:"1px solid #f0e0cc"}}>{m}</span>
+                      ))}
+                    </div>
+                    <div style={{display:"flex",gap:7,marginBottom:0}}>
+                      <Btn variant="outline" onClick={()=>setMenuChef(c)} style={{flex:1,padding:"9px",fontSize:12}}>
+                        📋 View Menu
+                      </Btn>
+                      <Btn onClick={()=>startOrder(c)} style={{flex:1,padding:"9px",fontSize:12}}>
+                        Order →
+                      </Btn>
+                    </div>
+                    {/* Rate this Chef */}
+                    {!chefRatings[c.id]?.submitted?(
+                      <div style={{marginTop:11,borderTop:"1px solid #f0e8dc",paddingTop:9}}>
+                        <div style={{fontSize:11,fontWeight:700,color:C.muted,marginBottom:5}}>⭐ Rate this Chef</div>
+                        <Stars value={chefRatings[c.id]?.rating||0}
+                          onChange={r=>setChefRatings(prev=>({...prev,[c.id]:{...prev[c.id],rating:r}}))}/>
+                        <textarea value={chefRatings[c.id]?.note||""}
+                          onChange={e=>setChefRatings(prev=>({...prev,[c.id]:{...prev[c.id],note:e.target.value}}))}
+                          placeholder="Share your experience with this chef..."
+                          rows={2}
+                          style={{width:"100%",marginTop:7,padding:"7px 9px",borderRadius:8,
+                            border:"1.5px solid #e8ddd0",fontSize:11,fontFamily:"inherit",
+                            resize:"none",outline:"none"}}/>
+                        <Btn variant="outline" onClick={()=>{
+                          if(chefRatings[c.id]?.rating)
+                            setChefRatings(prev=>({...prev,[c.id]:{...prev[c.id],submitted:true}}));
+                        }} style={{width:"100%",marginTop:5,padding:"7px",fontSize:11}}>
+                          Submit Rating
+                        </Btn>
+                      </div>
+                    ):(
+                      <div style={{marginTop:9,borderTop:"1px solid #f0e8dc",paddingTop:7,
+                        display:"flex",alignItems:"center",gap:5}}>
+                        <Stars value={chefRatings[c.id].rating}/>
+                        <span style={{fontSize:11,color:C.sage,fontWeight:700}}>✓ Submitted</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {/* CART */}
+        {view==="cart"&&(
+          <div className="fade-in">
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
+              <h2 style={{fontSize:21,fontWeight:900,color:C.rust,margin:0}}>🛒 Your Cart</h2>
+              {cart.length>0&&(
+                <button onClick={clearCart} style={{background:"transparent",border:`1.5px solid #e8ddd0`,borderRadius:8,padding:"5px 12px",fontSize:11,color:C.muted,cursor:"pointer",fontFamily:"inherit",fontWeight:700}}>Clear All</button>
+              )}
+            </div>
+
+            {cart.length===0?(
+              <div style={{textAlign:"center",padding:"60px 20px"}}>
+                <div style={{fontSize:60,marginBottom:12}}>🛒</div>
+                <div style={{fontWeight:800,color:C.charcoal,fontSize:18,marginBottom:6}}>Your cart is empty</div>
+                <div style={{color:C.muted,fontSize:13,marginBottom:20}}>Browse our chefs and add dishes you love!</div>
+                <Btn onClick={()=>setView("order")} style={{padding:"11px 28px"}}>Browse Chefs →</Btn>
+              </div>
+            ):(
+              <div>
+                {/* Group items by chef */}
+                {Array.from(new Set(cart.map(x=>x.chef.id))).map(chefId=>{
+                  const chefItems=cart.filter(x=>x.chef.id===chefId);
+                  const chefObj=chefItems[0].chef;
+                  const chefSubtotal=chefItems.reduce((s,x)=>s+x.item.price*x.qty,0);
+                  return(
+                    <Card key={chefId} style={{marginBottom:14}}>
+                      {/* Chef header */}
+                      <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12,paddingBottom:10,borderBottom:"1px solid #f0e8dc"}}>
+                        <span style={{fontSize:24}}>{chefObj.avatar}</span>
+                        <div style={{flex:1}}>
+                          <div style={{fontWeight:800,fontSize:14,color:C.charcoal}}>{chefObj.name}</div>
+                          <div style={{fontSize:11,color:C.muted}}>{chefObj.specialty} · {chefObj.deliveryTime}</div>
+                        </div>
+                        <span style={{fontSize:11,fontWeight:700,color:C.saffron}}>{chefItems.reduce((s,x)=>s+x.qty,0)} item{chefItems.reduce((s,x)=>s+x.qty,0)!==1?"s":""}</span>
+                      </div>
+                      {/* Dish rows */}
+                      {chefItems.map(({item,qty})=>(
+                        <div key={item.name} style={{display:"flex",alignItems:"center",gap:10,paddingBottom:10,marginBottom:10,borderBottom:"1px dashed #f0e8dc"}}>
+                          <span style={{fontSize:22,flexShrink:0}}>{item.emoji}</span>
+                          <div style={{flex:1,minWidth:0}}>
+                            <div style={{fontWeight:700,fontSize:13,color:C.charcoal}}>{item.name}</div>
+                            <div style={{fontSize:11,color:C.muted}}>₹{item.price} × {qty}</div>
+                          </div>
+                          <div style={{display:"flex",alignItems:"center",gap:6,flexShrink:0}}>
+                            <button onClick={()=>removeFromCart(item.name,chefObj.id)} style={{width:26,height:26,borderRadius:"50%",border:`2px solid ${C.saffron}`,background:"#fff",color:C.saffron,fontWeight:900,cursor:"pointer",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
+                            <span style={{fontWeight:800,minWidth:18,textAlign:"center",color:C.charcoal}}>{qty}</span>
+                            <button onClick={()=>addToCart(item,chefObj)} style={{width:26,height:26,borderRadius:"50%",border:"none",background:`linear-gradient(135deg,${C.saffron},${C.rust})`,color:"#fff",fontWeight:900,cursor:"pointer",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
+                            <span style={{fontWeight:900,color:C.rust,fontSize:13,minWidth:44,textAlign:"right"}}>₹{item.price*qty}</span>
+                          </div>
+                        </div>
+                      ))}
+                      {/* Chef subtotal */}
+                      <div style={{display:"flex",justifyContent:"space-between",paddingTop:4}}>
+                        <span style={{fontSize:12,color:C.muted,fontWeight:700}}>Chef Subtotal</span>
+                        <span style={{fontWeight:800,color:C.charcoal,fontSize:13}}>₹{chefSubtotal}</span>
+                      </div>
+                    </Card>
+                  );
+                })}
+
+                {/* Order Summary */}
+                <Card style={{background:"linear-gradient(135deg,#fff8f0,#fef3e8)",borderLeft:`4px solid ${C.saffron}`,marginBottom:14}}>
+                  <div style={{fontWeight:800,color:C.charcoal,marginBottom:10,fontSize:14}}>📋 Order Summary</div>
+                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}>
+                    <span style={{fontSize:13,color:C.muted}}>Subtotal ({cartCount} items)</span>
+                    <span style={{fontWeight:700,color:C.charcoal}}>₹{cartTotal}</span>
+                  </div>
+                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}>
+                    <span style={{fontSize:13,color:C.muted}}>Delivery Fee</span>
+                    <span style={{fontWeight:700,color:C.sage,fontSize:13}}>FREE 🎉</span>
+                  </div>
+                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}>
+                    <span style={{fontSize:13,color:C.muted}}>Platform Fee</span>
+                    <span style={{fontWeight:700,color:C.charcoal}}>₹5</span>
+                  </div>
+                  <div style={{borderTop:"1.5px solid #f0e8dc",marginTop:10,paddingTop:10,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                    <span style={{fontSize:16,fontWeight:900,color:C.charcoal}}>Total Amount</span>
+                    <span style={{fontSize:20,fontWeight:900,color:C.rust}}>₹{cartTotal+5}</span>
+                  </div>
+                </Card>
+
+                <Btn onClick={()=>{clearCart();startOrder(cart[0]?.chef);}} style={{width:"100%",fontSize:15,padding:"14px"}}>
+                  Place Order · ₹{cartTotal+5} →
+                </Btn>
+                <p style={{textAlign:"center",fontSize:11,color:C.muted,marginTop:8}}>🔒 Safe & secure checkout</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TRACK */}
+        {view==="track"&&chef&&(
+          <div className="fade-in">
+            <h2 style={{fontSize:21,fontWeight:900,color:C.rust,margin:"0 0 3px"}}>Live Order Tracking</h2>
+            <p style={{color:C.muted,fontSize:13,marginBottom:18}}>from {chef.name}</p>
+            <Card style={{marginBottom:18,background:"linear-gradient(135deg,#fff8f0,#fef3e8)"}}>
+              <div style={{display:"flex",gap:11,alignItems:"center",marginBottom:14}}>
+                <span style={{fontSize:30}}>{chef.avatar}</span>
+                <div>
+                  <div style={{fontWeight:800,color:C.charcoal}}>{chef.name}</div>
+                  <div style={{fontSize:11,color:C.muted}}>{chef.specialty} · ₹{chef.price}</div>
+                </div>
+              </div>
+              <div>
+                {ORDER_STAGES.map((s,i)=>(
+                  <div key={s} style={{display:"flex",alignItems:"flex-start",gap:11}}>
+                    <div style={{display:"flex",flexDirection:"column",alignItems:"center"}}>
+                      <div style={{width:26,height:26,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",
+                        background:i<=stage?`linear-gradient(135deg,${C.saffron},${C.rust})`:"#e8ddd0",
+                        color:i<=stage?"#fff":C.muted,fontSize:11,fontWeight:700,transition:"all 0.4s",
+                        boxShadow:i===stage?`0 0 0 4px ${C.saffron}30`:"none"}}>
+                        {i<stage?"✓":i+1}
+                      </div>
+                      {i<ORDER_STAGES.length-1&&(
+                        <div style={{width:2,height:26,background:i<stage?C.saffron:"#e8ddd0",transition:"background 0.4s"}}/>
+                      )}
+                    </div>
+                    <div style={{paddingTop:3,paddingBottom:i<ORDER_STAGES.length-1?14:0}}>
+                      <div style={{fontWeight:i===stage?800:600,color:i<=stage?C.charcoal:C.muted,fontSize:13}}>{s}</div>
+                      {i===stage&&<div style={{fontSize:10,color:C.saffron,fontWeight:700,marginTop:1}}>● Live now</div>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+            {stage>=ORDER_STAGES.length-1&&(
+              <Card style={{borderLeft:`4px solid ${C.sage}`,marginBottom:14}}>
+                <div style={{fontSize:20,marginBottom:3}}>🎉</div>
+                <div style={{fontWeight:800,color:C.cardamom}}>Order Delivered!</div>
+                <div style={{fontSize:12,color:C.muted,marginTop:3}}>Enjoy your meal from {chef.name}!</div>
+                <Btn onClick={()=>setView("feedback")} variant="green" style={{width:"100%",marginTop:11}}>Leave Feedback →</Btn>
+              </Card>
+            )}
+            <div style={{background:"#e8f5e9",borderRadius:11,padding:"11px 13px"}}>
+              <div style={{fontSize:11,fontWeight:700,color:C.sage}}>🗺️ Route Optimized</div>
+              <div style={{fontSize:11,color:C.muted,marginTop:2}}>Fastest route selected · {chef.deliveryTime} · {user.address}</div>
+            </div>
+          </div>
+        )}
+
+        {/* FEEDBACK */}
+        {view==="feedback"&&(
+          <div className="fade-in">
+            <h2 style={{fontSize:21,fontWeight:900,color:C.rust,margin:"0 0 14px"}}>Your Feedback</h2>
+            {!sent?(
+              <Card>
+                <div style={{marginBottom:14}}>
+                  <div style={{fontWeight:700,marginBottom:5,fontSize:14}}>How was your meal?</div>
+                  <Stars value={rating} onChange={setRating}/>
+                </div>
+                <div style={{marginBottom:14}}>
+                  <div style={{fontWeight:700,marginBottom:5,fontSize:14}}>Tell us more</div>
+                  <textarea value={note} onChange={e=>setNote(e.target.value)}
+                    placeholder="What did you love? Any suggestions?"
+                    rows={3}
+                    style={{width:"100%",padding:"9px 11px",borderRadius:8,border:"1.5px solid #e8ddd0",
+                      fontSize:13,fontFamily:"inherit",resize:"vertical",outline:"none"}}/>
+                </div>
+                <Btn onClick={()=>{setSent(true);fetchAI();}} style={{width:"100%"}}>Submit & Get AI Analysis →</Btn>
+              </Card>
+            ):(
+              <div>
+                <Card style={{borderLeft:`4px solid ${C.sage}`,marginBottom:14}}>
+                  <div style={{fontSize:18}}>✅</div>
+                  <div style={{fontWeight:800,color:C.cardamom}}>Feedback Submitted!</div>
+                  <div style={{fontSize:12,color:C.muted}}>Rating: {rating}/5 ⭐</div>
+                </Card>
+                <Card>
+                  <div style={{fontWeight:800,color:C.rust,marginBottom:11}}>🤖 Your Weekly AI Analysis</div>
+                  {loading?(
+                    <div style={{display:"flex",alignItems:"center",gap:8,color:C.muted}}>
+                      <div style={{width:18,height:18,border:`3px solid ${C.saffron}`,borderTopColor:"transparent",
+                        borderRadius:"50%",animation:"spin 1s linear infinite"}}/>
+                      Analysing your taste preferences...
+                    </div>
+                  ):(
+                    <div style={{fontSize:13,color:C.charcoal,lineHeight:1.7,whiteSpace:"pre-wrap",
+                      borderRadius:8,padding:11,background:C.cream}}>{analysis}</div>
+                  )}
+                </Card>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* DASHBOARD */}
+        {view==="dashboard"&&(
+          <div className="fade-in">
+            <h2 style={{fontSize:21,fontWeight:900,color:C.rust,margin:"0 0 14px"}}>Your Dashboard</h2>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9,marginBottom:14}}>
+              {[
+                {label:"Active Plan",value:plan?SUBS.find(s=>s.id===plan)?.icon+" "+SUBS.find(s=>s.id===plan)?.label.split("·")[0]:"None",color:C.saffron},
+                {label:"Total Orders",value:"7",color:C.rust},
+                {label:"Avg Rating Given",value:"4.8 ⭐",color:C.sage},
+                {label:"Favourite Chef",value:chef?.name||"TBD",color:C.clay},
+              ].map(st=>(
+                <Card key={st.label} style={{textAlign:"center",padding:"14px 10px"}}>
+                  <div style={{fontSize:16,fontWeight:900,color:st.color}}>{st.value}</div>
+                  <div style={{fontSize:10,color:C.muted,marginTop:2}}>{st.label}</div>
+                </Card>
+              ))}
+            </div>
+            <Card style={{marginBottom:14}}>
+              <div style={{fontWeight:800,marginBottom:11,color:C.charcoal,fontSize:14}}>🍽️ Meal Recommendations</div>
+              {CHEFS.slice(0,3).map(c=>(
+                <div key={c.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",
+                  padding:"7px 0",borderBottom:"1px solid #f0e8dc"}}>
+                  <div>
+                    <div style={{fontWeight:700,fontSize:13}}>{c.meals[0]}</div>
+                    <div style={{fontSize:10,color:C.muted}}>by {c.name}</div>
+                  </div>
+                  <div style={{fontSize:12,fontWeight:700,color:C.saffron}}>₹{c.price}</div>
+                </div>
+              ))}
+            </Card>
+            <Card>
+              <div style={{fontWeight:800,marginBottom:11,color:C.charcoal,fontSize:14}}>📍 Order History</div>
+              {[
+                {chef:"Meera Aunty",meal:"Dal Makhani",date:"Today",status:"Delivered"},
+                {chef:"Rajan Bhai",meal:"Idli Sambar",date:"Yesterday",status:"Delivered"},
+                {chef:"Sunita Di",meal:"Thepla",date:"2 days ago",status:"Delivered"},
+              ].map((o,i)=>(
+                <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"7px 0",
+                  borderBottom:i<2?"1px solid #f0e8dc":"none"}}>
+                  <div>
+                    <div style={{fontWeight:700,fontSize:12}}>{o.meal}</div>
+                    <div style={{fontSize:10,color:C.muted}}>{o.chef} · {o.date}</div>
+                  </div>
+                  <Badge text={o.status} color={C.sage}/>
+                </div>
+              ))}
+            </Card>
+          </div>
+        )}
+
+      </div>
+
+      {/* Chef Menu Modal */}
+      {menuChef&&(
+        <ChefMenuModal chef={menuChef} onClose={()=>setMenuChef(null)}
+          onAddToCart={(item,chef,dir)=>dir>0?addToCart(item,chef):removeFromCart(item.name,chef.id)}
+          cart={cart}
+          onOrder={c=>{setMenuChef(null);setView("cart");}}/> 
+      )}
+
+      {/* Bottom Nav */}
+      <div style={{position:"fixed",bottom:0,left:0,right:0,background:"#fff",
+        borderTop:"1px solid #f0e8dc",display:"flex",boxShadow:"0 -4px 20px rgba(0,0,0,0.08)",zIndex:100}}>
+        {nav.map(item=>(
+          <button key={item.id} onClick={()=>setView(item.id)} style={{
+            flex:1,padding:"9px 4px",border:"none",background:"transparent",
+            cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:2,
+            color:view===item.id?C.rust:C.muted,fontFamily:"inherit",position:"relative"}}>
+            <span style={{fontSize:19,position:"relative"}}>
+              {item.icon}
+              {item.id==="cart"&&cartCount>0&&(
+                <span style={{position:"absolute",top:-4,right:-6,background:C.rust,color:"#fff",borderRadius:"50%",width:16,height:16,fontSize:9,fontWeight:900,display:"flex",alignItems:"center",justifyContent:"center",border:"2px solid #fff"}}>{cartCount}</span>
+              )}
+            </span>
+            <span style={{fontSize:10,fontWeight:view===item.id?800:500}}>{item.label}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── CHEF APP ───────────────────────────────────────────────────────────────────
+function ChefApp({user,onLogout}){
+  const[cv,setCv]=useState("dashboard");
+  const[orders,setOrders]=useState([
+    {id:"ORD001",customer:"Priya S.",meal:"Dal Makhani",stage:1,time:"12:30 PM"},
+    {id:"ORD002",customer:"Rahul K.",meal:"Paneer Tikka",stage:0,time:"1:00 PM"},
+    {id:"ORD003",customer:"Ananya M.",meal:"Butter Chicken",stage:2,time:"1:30 PM"},
+  ]);
+  const[aiText,setAiText]=useState("");
+  const[aiLoad,setAiLoad]=useState(false);
+
+  // ── Menu Management State ────────────────────────────────────────
+  const defaultMenu=[
+    {category:"Main Course",items:[
+      {name:"Dal Makhani",desc:"Slow-cooked black lentils in rich tomato-butter gravy",price:130,tag:"Bestseller",emoji:"🫕",weekSpecial:true},
+      {name:"Butter Chicken",desc:"Tender chicken in velvety tomato-cream sauce",price:150,tag:"Popular",emoji:"🍗",weekSpecial:false},
+      {name:"Paneer Tikka Masala",desc:"Grilled paneer in spiced onion-tomato gravy",price:140,tag:"Veg",emoji:"🧀",weekSpecial:false},
+      {name:"Rajma Chawal",desc:"Kidney beans curry served with steamed rice",price:110,tag:"Comfort",emoji:"🍛",weekSpecial:false},
+    ]},
+    {category:"Breads & Rice",items:[
+      {name:"Butter Naan",desc:"Soft tandoor-style bread with butter",price:30,tag:"Side",emoji:"🫓",weekSpecial:false},
+      {name:"Jeera Rice",desc:"Fragrant cumin-tempered basmati rice",price:60,tag:"Side",emoji:"🍚",weekSpecial:false},
+    ]},
+    {category:"Desserts",items:[
+      {name:"Gulab Jamun (4 pcs)",desc:"Soft milk-solid dumplings in rose syrup",price:60,tag:"Sweet",emoji:"🍮",weekSpecial:false},
+    ]},
+  ];
+  const[chefMenu,setChefMenu]=useState(defaultMenu);
+  const[showAddForm,setShowAddForm]=useState(false);
+  const[editingCategory,setEditingCategory]=useState("");
+  const[newItem,setNewItem]=useState({name:"",desc:"",price:"",emoji:"🍽️",tag:"New"});
+  const[newCatName,setNewCatName]=useState("");
+  const[showNewCat,setShowNewCat]=useState(false);
+
+  const EMOJIS=["🍛","🍗","🥘","🫕","🍲","🍜","🍝","🥗","🧀","🐟","🦐","🍤","🥞","🫓","🍚","🍮","🧁","🍰","🍩","🥛","☕","🥥","🌽","🥦","🧆","🍱"];
+  const TAGS=["New","Bestseller","Popular","Veg","Special","Spicy","Healthy","Sweet","Side","Comfort","Premium","Seasonal"];
+
+  function addItem(){
+    if(!newItem.name||!newItem.price||!editingCategory)return;
+    setChefMenu(prev=>prev.map(sec=>
+      sec.category===editingCategory
+        ?{...sec,items:[...sec.items,{...newItem,price:Number(newItem.price),weekSpecial:false}]}
+        :sec
+    ));
+    setNewItem({name:"",desc:"",price:"",emoji:"🍽️",tag:"New"});
+    setShowAddForm(false);setEditingCategory("");
+  }
+  function deleteItem(category,itemName){
+    setChefMenu(prev=>prev.map(sec=>
+      sec.category===category?{...sec,items:sec.items.filter(i=>i.name!==itemName)}:sec
+    ));
+  }
+  function toggleWeekSpecial(category,itemName){
+    setChefMenu(prev=>prev.map(sec=>
+      sec.category===category
+        ?{...sec,items:sec.items.map(i=>i.name===itemName?{...i,weekSpecial:!i.weekSpecial}:i)}
+        :sec
+    ));
+  }
+  function addCategory(){
+    if(!newCatName.trim())return;
+    setChefMenu(prev=>[...prev,{category:newCatName.trim(),items:[]}]);
+    setNewCatName("");setShowNewCat(false);
+  }
+  function deleteCategory(cat){
+    setChefMenu(prev=>prev.filter(s=>s.category!==cat));
+  }
+
+  function advance(id){setOrders(p=>p.map(o=>o.id===id&&o.stage<3?{...o,stage:o.stage+1}:o));}
+
+  async function getAI(){
+    setAiLoad(true);setAiText("");
+    try{
+      const r=await fetch("https://api.anthropic.com/v1/messages",{
+        method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:800,
+          messages:[{role:"user",content:`You are an advisor for home chef ${user.name}. They had 18 orders this week, avg rating 4.8/5, ₹8,400 revenue. Customer feedback: "portions could be bigger", "loved the spices", "delivery was slightly late twice". Give a warm weekly analysis: what went well, operational improvements, menu suggestions for more subscribers, encouragement. Use food emojis.`}]})
+      });
+      const d=await r.json();
+      setAiText(d.content?.[0]?.text||"Fantastic week chef! Keep it up 👨‍🍳");
+    }catch{
+      setAiText("What a fantastic week in the kitchen! 🌶️ Your spice blends are getting rave reviews. Consider increasing portion sizes slightly — customers love generous helpings. Plan prep 10 min earlier to avoid delivery delays. Adding a weekend special could attract new subscribers. Keep up the incredible work! 👨‍🍳");
+    }
+    setAiLoad(false);
+  }
+
+  const nav=[{id:"dashboard",icon:"📊",label:"Dashboard"},{id:"orders",icon:"📦",label:"Orders"},{id:"menu",icon:"📝",label:"My Menu"},{id:"feedback",icon:"💬",label:"Insights"}];
+  const stageLabels=["Accepted","Cooking","Out for Delivery","Delivered"];
+  const stageColors=[C.turmeric,C.saffron,C.rust,C.sage];
+  const dishes=DISH_DATA[1]||[];
+  const topRated=[...dishes].sort((a,b)=>b.rating-a.rating)[0];
+  const bestseller=[...dishes].sort((a,b)=>b.orders-a.orders)[0];
+
+  return(
+    <div style={{minHeight:"100vh",background:"linear-gradient(160deg,#f0fdf4,#dcfce7 60%,#d1fae5)",paddingBottom:80}}>
+      <div style={{background:`linear-gradient(135deg,${C.cardamom},${C.sage})`,padding:"14px 18px",
+        display:"flex",justifyContent:"space-between",alignItems:"center",
+        boxShadow:"0 4px 20px rgba(45,74,34,0.3)",position:"sticky",top:0,zIndex:50}}>
+        <div>
+          <div style={{fontSize:17,fontWeight:900,color:"#fff",letterSpacing:-0.5}}>👩‍🍳 Chef Portal</div>
+          <div style={{fontSize:11,color:"rgba(255,255,255,0.8)"}}>Welcome, {user.name.split(" ")[0]}!</div>
+        </div>
+        <button onClick={onLogout} style={{background:"rgba(255,255,255,0.2)",border:"none",
+          borderRadius:8,padding:"6px 12px",color:"#fff",fontSize:12,cursor:"pointer",fontFamily:"inherit"}}>
+          Logout
+        </button>
+      </div>
+
+      <div style={{padding:"18px 15px",maxWidth:480,margin:"0 auto"}}>
+
+        {cv==="dashboard"&&(
+          <div className="fade-in">
+            <h2 style={{fontSize:21,fontWeight:900,color:C.cardamom,margin:"0 0 14px"}}>Your Kitchen Stats</h2>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9,marginBottom:14}}>
+              {[
+                {label:"Weekly Revenue",value:"₹8,400",icon:"💰",color:C.saffron},
+                {label:"Orders in Progress",value:"3",icon:"🔥",color:C.rust},
+                {label:"Delivered Today",value:"7",icon:"✅",color:C.sage},
+                {label:"Avg Prep Time",value:"28 min",icon:"⏱️",color:C.clay},
+                {label:"Satisfaction Score",value:"4.8 ⭐",icon:"😊",color:C.turmeric},
+                {label:"Repeat Subscribers",value:"12",icon:"🔁",color:C.cardamom},
+              ].map(s=>(
+                <Card key={s.label} style={{textAlign:"center",padding:"13px 10px"}}>
+                  <div style={{fontSize:20,marginBottom:2}}>{s.icon}</div>
+                  <div style={{fontSize:17,fontWeight:900,color:s.color}}>{s.value}</div>
+                  <div style={{fontSize:10,color:C.muted}}>{s.label}</div>
+                </Card>
+              ))}
+            </div>
+            <Card style={{background:"linear-gradient(135deg,#f0fdf4,#dcfce7)",borderLeft:`4px solid ${C.sage}`,marginBottom:13}}>
+              <div style={{fontWeight:800,color:C.cardamom,marginBottom:3,fontSize:14}}>🗓️ This Week Summary</div>
+              <div style={{fontSize:12,color:C.muted}}>18 orders · 3 new subscribers · 2 repeat plans renewed</div>
+              <div style={{marginTop:7,display:"flex",gap:4,flexWrap:"wrap"}}>
+                {["Dal Makhani ×5","Paneer Tikka ×4","Butter Chicken ×3","Rajma ×3"].map(t=>(
+                  <Badge key={t} text={t} color={C.sage}/>
+                ))}
+              </div>
+            </Card>
+            {/* Dish Analytics */}
+            <Card>
+              <div style={{fontWeight:800,color:C.charcoal,marginBottom:11,fontSize:14}}>🍽️ Your Menu Performance</div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9,marginBottom:13}}>
+                <div style={{background:"linear-gradient(135deg,#fef9c3,#fde68a)",borderRadius:11,padding:"11px 9px",textAlign:"center"}}>
+                  <div style={{fontSize:18}}>🏆</div>
+                  <div style={{fontSize:9,fontWeight:700,color:C.clay,textTransform:"uppercase",letterSpacing:0.5,marginTop:2}}>Highest Rated</div>
+                  <div style={{fontWeight:900,color:C.rust,fontSize:12,marginTop:3}}>{topRated?.name}</div>
+                  <div style={{fontSize:11,color:C.muted}}>★ {topRated?.rating}</div>
+                </div>
+                <div style={{background:"linear-gradient(135deg,#fee2e2,#fecaca)",borderRadius:11,padding:"11px 9px",textAlign:"center"}}>
+                  <div style={{fontSize:18}}>🔥</div>
+                  <div style={{fontSize:9,fontWeight:700,color:C.clay,textTransform:"uppercase",letterSpacing:0.5,marginTop:2}}>Bestselling</div>
+                  <div style={{fontWeight:900,color:C.rust,fontSize:12,marginTop:3}}>{bestseller?.name}</div>
+                  <div style={{fontSize:11,color:C.muted}}>{bestseller?.orders} orders</div>
+                </div>
+              </div>
+              <div style={{fontSize:11,fontWeight:700,color:C.muted,marginBottom:7,textTransform:"uppercase",letterSpacing:0.5}}>All Dishes</div>
+              {dishes.map((d,i)=>(
+                <div key={d.name} style={{display:"flex",alignItems:"center",justifyContent:"space-between",
+                  padding:"7px 0",borderBottom:i<dishes.length-1?"1px solid #f0e8dc":"none",flexWrap:"wrap",gap:4}}>
+                  <div style={{fontWeight:700,fontSize:12,color:C.charcoal}}>{d.name}</div>
+                  <div style={{display:"flex",gap:7,alignItems:"center",flexWrap:"wrap"}}>
+                    <span style={{fontSize:11,color:C.saffron,fontWeight:700}}>★ {d.rating}</span>
+                    <span style={{fontSize:10,color:C.muted}}>{d.orders} orders</span>
+                    {d.name===topRated?.name&&<Badge text="Top Rated" color={C.turmeric}/>}
+                    {d.name===bestseller?.name&&<Badge text="Bestseller" color={C.rust}/>}
+                  </div>
+                </div>
+              ))}
+            </Card>
+          </div>
+        )}
+
+        {cv==="orders"&&(
+          <div className="fade-in">
+            <h2 style={{fontSize:21,fontWeight:900,color:C.cardamom,margin:"0 0 14px"}}>Live Orders</h2>
+            {orders.map(o=>(
+              <Card key={o.id} style={{marginBottom:11,borderLeft:`4px solid ${stageColors[o.stage]}`}}>
+                <div style={{display:"flex",justifyContent:"space-between",marginBottom:7,flexWrap:"wrap",gap:4}}>
+                  <div>
+                    <div style={{fontWeight:800,fontSize:14}}>{o.meal}</div>
+                    <div style={{fontSize:11,color:C.muted}}>👤 {o.customer} · {o.time}</div>
+                  </div>
+                  <Badge text={stageLabels[o.stage]} color={stageColors[o.stage]}/>
+                </div>
+                <div style={{display:"flex",gap:5,marginBottom:9}}>
+                  {stageLabels.map((s,i)=>(
+                    <div key={s} style={{flex:1,height:4,borderRadius:2,
+                      background:i<=o.stage?stageColors[o.stage]:"#e8ddd0",transition:"background 0.3s"}}/>
+                  ))}
+                </div>
+                {o.stage<3?(
+                  <Btn onClick={()=>advance(o.id)} variant="green" style={{width:"100%",fontSize:12,padding:"8px"}}>
+                    Mark as "{stageLabels[o.stage+1]}" →
+                  </Btn>
+                ):(
+                  <div style={{textAlign:"center",color:C.sage,fontWeight:800,fontSize:12}}>🎉 Delivered!</div>
+                )}
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {cv==="feedback"&&(
+          <div className="fade-in">
+            <h2 style={{fontSize:21,fontWeight:900,color:C.cardamom,margin:"0 0 14px"}}>Customer Feedback & AI Insights</h2>
+            <Card style={{marginBottom:14}}>
+              <div style={{fontWeight:800,marginBottom:11,fontSize:14}}>💬 Recent Feedback Highlights</div>
+              {[
+                {customer:"Priya S.",note:"Loved the Dal Makhani! So homely and full of flavour.",rating:5},
+                {customer:"Rahul K.",note:"Portions could be slightly bigger, but taste is 10/10.",rating:4},
+                {customer:"Ananya M.",note:"Delivery was a few minutes late but food was amazing.",rating:4},
+              ].map((fb,i)=>(
+                <div key={i} style={{padding:"9px 0",borderBottom:i<2?"1px solid #f0e8dc":"none"}}>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:2,flexWrap:"wrap",gap:4}}>
+                    <div style={{fontWeight:700,fontSize:12}}>{fb.customer}</div>
+                    <Stars value={fb.rating}/>
+                  </div>
+                  <div style={{fontSize:12,color:C.muted,fontStyle:"italic"}}>"{fb.note}"</div>
+                </div>
+              ))}
+            </Card>
+            <Btn onClick={getAI} style={{width:"100%",marginBottom:14}}>🤖 Generate Weekly AI Analysis →</Btn>
+            {(aiLoad||aiText)&&(
+              <Card>
+                <div style={{fontWeight:800,color:C.rust,marginBottom:11,fontSize:14}}>🤖 AI Weekly Insights for You</div>
+                {aiLoad?(
+                  <div style={{display:"flex",alignItems:"center",gap:7,color:C.muted}}>
+                    <div style={{width:18,height:18,border:`3px solid ${C.sage}`,borderTopColor:"transparent",
+                      borderRadius:"50%",animation:"spin 1s linear infinite"}}/>
+                    Analysing your kitchen performance...
+                  </div>
+                ):(
+                  <div style={{fontSize:13,color:C.charcoal,lineHeight:1.7,whiteSpace:"pre-wrap",
+                    background:"#f0fdf4",borderRadius:8,padding:11}}>{aiText}</div>
+                )}
+              </Card>
+            )}
+          </div>
+        )}
+
+
+        {/* ── MY MENU MANAGEMENT ── */}
+        {cv==="menu"&&(
+          <div className="fade-in">
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
+              <h2 style={{fontSize:21,fontWeight:900,color:C.cardamom,margin:0}}>📝 My Menu</h2>
+              <button onClick={()=>setShowNewCat(v=>!v)} style={{background:`linear-gradient(135deg,${C.sage},${C.cardamom})`,border:"none",borderRadius:8,padding:"7px 13px",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>+ Category</button>
+            </div>
+
+            {/* Week's Specials strip */}
+            {chefMenu.flatMap(s=>s.items).filter(i=>i.weekSpecial).length>0&&(
+              <div style={{marginBottom:16,padding:"12px 14px",background:"linear-gradient(135deg,#fef9c3,#fde68a)",borderRadius:14,border:"1px solid #f0d060"}}>
+                <div style={{fontWeight:800,fontSize:13,color:C.clay,marginBottom:8}}>⭐ This Week's Specials</div>
+                <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+                  {chefMenu.flatMap(s=>s.items).filter(i=>i.weekSpecial).map(i=>(
+                    <div key={i.name} style={{background:"#fff",borderRadius:10,padding:"5px 10px",display:"flex",alignItems:"center",gap:5,border:"1px solid #f0d060"}}>
+                      <span style={{fontSize:16}}>{i.emoji}</span>
+                      <span style={{fontSize:12,fontWeight:700,color:C.charcoal}}>{i.name}</span>
+                      <span style={{fontSize:12,fontWeight:800,color:C.rust}}>₹{i.price}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* New category form */}
+            {showNewCat&&(
+              <div style={{background:"#f0fdf4",borderRadius:12,padding:"14px",marginBottom:14,border:"1px solid #bbf7d0"}}>
+                <div style={{fontSize:12,fontWeight:700,color:C.cardamom,marginBottom:8}}>New Category Name</div>
+                <div style={{display:"flex",gap:8}}>
+                  <input value={newCatName} onChange={e=>setNewCatName(e.target.value)} placeholder="e.g. Starters, Drinks..."
+                    style={{flex:1,padding:"9px 12px",borderRadius:8,border:`1.5px solid ${C.sage}`,fontSize:13,outline:"none",fontFamily:"inherit"}}/>
+                  <button onClick={addCategory} style={{padding:"9px 16px",borderRadius:8,background:`linear-gradient(135deg,${C.sage},${C.cardamom})`,border:"none",color:"#fff",fontWeight:700,cursor:"pointer",fontFamily:"inherit",fontSize:13}}>Add</button>
+                </div>
+              </div>
+            )}
+
+            {/* Menu Categories */}
+            {chefMenu.map(section=>(
+              <div key={section.category} style={{marginBottom:16}}>
+                {/* Category header */}
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+                  <div style={{fontSize:12,fontWeight:800,color:C.muted,textTransform:"uppercase",letterSpacing:1,paddingLeft:8,borderLeft:`3px solid ${C.sage}`}}>{section.category}</div>
+                  <div style={{display:"flex",gap:6}}>
+                    <button onClick={()=>{setEditingCategory(section.category);setShowAddForm(true);}} style={{fontSize:11,fontWeight:700,color:C.sage,background:"#f0fdf4",border:`1px solid ${C.sage}44`,borderRadius:6,padding:"4px 10px",cursor:"pointer",fontFamily:"inherit"}}>+ Add Dish</button>
+                    <button onClick={()=>deleteCategory(section.category)} style={{fontSize:11,fontWeight:700,color:"#e53935",background:"#fff5f5",border:"1px solid #ffcdd2",borderRadius:6,padding:"4px 10px",cursor:"pointer",fontFamily:"inherit"}}>🗑</button>
+                  </div>
+                </div>
+
+                {section.items.length===0&&(
+                  <div style={{textAlign:"center",padding:"12px",color:C.muted,fontSize:12,background:"#f9f9f9",borderRadius:10,border:"1px dashed #e0e0e0"}}>No dishes yet — add one above</div>
+                )}
+
+                {section.items.map(item=>(
+                  <div key={item.name} style={{background:item.weekSpecial?"linear-gradient(135deg,#fffbeb,#fef3c7)":"#fff",borderRadius:12,padding:"11px 12px",marginBottom:8,border:item.weekSpecial?"1.5px solid #fbbf24":"1px solid #f0e8dc",display:"flex",alignItems:"center",gap:10}}>
+                    <span style={{fontSize:24,flexShrink:0}}>{item.emoji}</span>
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{display:"flex",alignItems:"center",gap:5,flexWrap:"wrap"}}>
+                        <span style={{fontWeight:800,fontSize:13,color:C.charcoal}}>{item.name}</span>
+                        {item.weekSpecial&&<span style={{fontSize:9,fontWeight:800,background:"#fbbf24",color:"#78350f",padding:"1px 6px",borderRadius:20}}>⭐ Week's Special</span>}
+                      </div>
+                      <div style={{fontSize:10,color:C.muted,marginTop:1}}>{item.desc}</div>
+                      <div style={{fontSize:12,fontWeight:900,color:C.rust,marginTop:3}}>₹{item.price}</div>
+                    </div>
+                    <div style={{display:"flex",flexDirection:"column",gap:5,flexShrink:0,alignItems:"center"}}>
+                      <button onClick={()=>toggleWeekSpecial(section.category,item.name)}
+                        title={item.weekSpecial?"Remove from Week's Special":"Mark as Week's Special"}
+                        style={{background:item.weekSpecial?"#fbbf24":"#f9f9f9",border:item.weekSpecial?"1.5px solid #f59e0b":"1.5px solid #e0e0e0",borderRadius:8,padding:"4px 7px",cursor:"pointer",fontSize:14}}>
+                        ⭐
+                      </button>
+                      <button onClick={()=>deleteItem(section.category,item.name)} style={{background:"#fff5f5",border:"1.5px solid #ffcdd2",borderRadius:8,padding:"4px 7px",cursor:"pointer",fontSize:14}}>🗑️</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
+
+            {/* Add Item Form */}
+            {showAddForm&&(
+              <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.5)",zIndex:300,display:"flex",alignItems:"flex-end",justifyContent:"center"}}
+                onClick={e=>{if(e.target===e.currentTarget){setShowAddForm(false);setEditingCategory("");}}}>
+                <div style={{width:"100%",maxWidth:500,background:"#fff",borderRadius:"20px 20px 0 0",padding:"20px 18px 28px",boxShadow:"0 -8px 40px rgba(0,0,0,0.2)"}}>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
+                    <div style={{fontWeight:800,color:C.cardamom,fontSize:16}}>➕ Add Dish to "{editingCategory}"</div>
+                    <button onClick={()=>{setShowAddForm(false);setEditingCategory("");}} style={{background:"#f0f0f0",border:"none",borderRadius:"50%",width:30,height:30,cursor:"pointer",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+                  </div>
+
+                  {/* Emoji picker */}
+                  <div style={{marginBottom:12}}>
+                    <div style={{fontSize:11,fontWeight:700,color:C.muted,textTransform:"uppercase",letterSpacing:0.5,marginBottom:6}}>Pick Emoji</div>
+                    <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+                      {EMOJIS.map(e=>(
+                        <button key={e} onClick={()=>setNewItem(p=>({...p,emoji:e}))}
+                          style={{fontSize:20,width:36,height:36,borderRadius:8,border:newItem.emoji===e?`2px solid ${C.saffron}`:`1.5px solid #e8e8e8`,background:newItem.emoji===e?"#fff8f0":"#fafafa",cursor:"pointer"}}>
+                          {e}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {[{key:"name",label:"Dish Name",ph:"e.g. Paneer Butter Masala"},{key:"desc",label:"Description",ph:"Brief description of the dish"},{key:"price",label:"Price (₹)",ph:"e.g. 140",type:"number"}].map(f=>(
+                    <div key={f.key} style={{marginBottom:10}}>
+                      <div style={{fontSize:11,fontWeight:700,color:C.muted,textTransform:"uppercase",letterSpacing:0.5,marginBottom:4}}>{f.label}</div>
+                      <input value={newItem[f.key]} onChange={e=>setNewItem(p=>({...p,[f.key]:e.target.value}))}
+                        placeholder={f.ph} type={f.type||"text"}
+                        style={{width:"100%",padding:"9px 12px",borderRadius:8,border:`1.5px solid ${newItem[f.key]?C.sage:"#e8e8e8"}`,fontSize:13,outline:"none",fontFamily:"inherit"}}/>
+                    </div>
+                  ))}
+
+                  {/* Tag selector */}
+                  <div style={{marginBottom:14}}>
+                    <div style={{fontSize:11,fontWeight:700,color:C.muted,textTransform:"uppercase",letterSpacing:0.5,marginBottom:6}}>Tag</div>
+                    <div style={{display:"flex",flexWrap:"wrap",gap:5}}>
+                      {TAGS.map(t=>(
+                        <button key={t} onClick={()=>setNewItem(p=>({...p,tag:t}))}
+                          style={{fontSize:11,fontWeight:700,padding:"4px 10px",borderRadius:20,cursor:"pointer",fontFamily:"inherit",
+                            background:newItem.tag===t?C.saffron:"#f0f0f0",color:newItem.tag===t?"#fff":C.muted,
+                            border:newItem.tag===t?`1px solid ${C.saffron}`:"1px solid #e0e0e0"}}>
+                          {t}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <button onClick={addItem} disabled={!newItem.name||!newItem.price}
+                    style={{width:"100%",padding:"13px",borderRadius:10,border:"none",fontFamily:"inherit",
+                      background:newItem.name&&newItem.price?`linear-gradient(135deg,${C.sage},${C.cardamom})`:`#e0e0e0`,
+                      color:"#fff",fontWeight:800,fontSize:14,cursor:newItem.name&&newItem.price?"pointer":"not-allowed"}}>
+                    ✅ Add to Menu
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+      </div>
+
+      <div style={{position:"fixed",bottom:0,left:0,right:0,background:"#fff",
+        borderTop:"1px solid #e0f2e9",display:"flex",boxShadow:"0 -4px 20px rgba(0,0,0,0.08)",zIndex:100}}>
+        {nav.map(item=>(
+          <button key={item.id} onClick={()=>setCv(item.id)} style={{
+            flex:1,padding:"9px 4px",border:"none",background:"transparent",
+            cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:2,
+            color:cv===item.id?C.cardamom:C.muted,fontFamily:"inherit"}}>
+            <span style={{fontSize:19}}>{item.icon}</span>
+            <span style={{fontSize:10,fontWeight:cv===item.id?800:500}}>{item.label}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── ROOT ───────────────────────────────────────────────────────────────────────
+function App(){
+  const[user,setUser]=useState(null);
+  if(!user)return React.createElement(Login,{onLogin:setUser});
+  if(user.role==="chef")return React.createElement(ChefApp,{user,onLogout:()=>setUser(null)});
+  return React.createElement(UserApp,{user,onLogout:()=>setUser(null)});
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
+</script>
+</body>
+</html>
