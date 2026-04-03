@@ -1326,5 +1326,24 @@ function App(){
 
 ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
 </script>
+ <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA_TmIYG3I4aK6d3wcZXo76Zc0kp8F4CjM"",
+    authDomain: "homeplate-6847b.firebaseapp.com",
+    projectId: "homeplate-6847b,
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // MAKE GLOBAL (important)
+  window.db = db;
+  window.getDocs = getDocs;
+  window.collection = collection;
+  window.addDoc = addDoc;
+</script>
 </body>
 </html>
